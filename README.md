@@ -7,7 +7,9 @@ Installation
 ------------
 
 1] Upload the script to your website directory (the same as global index.php).
+
 2] Allow your user to execute this script with a chmod.
+
 3] Execute the script.
 
 Example of execution
