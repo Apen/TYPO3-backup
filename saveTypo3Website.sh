@@ -18,6 +18,7 @@
 # GNU General Public License for more details.
 ##########################################################################
 
+# Decode all args
 decodeArgs () {
 	while [ $# -gt 0 ]
 	do
@@ -75,7 +76,28 @@ decodeArgs () {
 	done
 }
 
+# Check for dependencies
+function checkDependency() {
+  if ! hash $1 2>&-; then
+    echo "Failed!"
+    echo "This script requires '$1' but it can not be found. Aborting." >&2
+    exit 1
+  fi
+}
+
 date 
+
+echo -n "Checking dependencies..."
+checkDependency "grep"
+checkDependency "sed"
+checkDependency "date"
+checkDependency "du"
+checkDependency "mysql"
+checkDependency "mysqldump"
+checkDependency "tar"
+checkDependency "rm"
+checkDependency "awk"
+echo "Succeeded."
 
 # force
 force=0
