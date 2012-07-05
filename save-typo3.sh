@@ -63,10 +63,10 @@ decodeArgs () {
 				echo "TYPO3 backup"
 				echo "-----------------------------------------------------------------------"
 				echo "All the parameters are optionnals :"
-				echo "-f          : force"
-				echo "-p <path>   : path of the site root"
-				echo "-o <output> : path of the save file .tar.gz"
-				echo "-sql <sql>  : filename of teh sql file .sql"
+				echo "-f          : force save without confirmation"
+				echo "-p <path>   : path of the site root directory"
+				echo "-o <output> : path of the save file directory with final /"
+				echo "-sql <sql>  : filename of the sql file .sql"
 				exit
 				;;
 			*)
@@ -77,7 +77,7 @@ decodeArgs () {
 }
 
 # Check for dependencies
-function checkDependency() {
+checkDependency() {
   if ! hash $1 2>&-; then
     echo "Failed!"
     echo "This script requires '$1' but it can not be found. Aborting." >&2
@@ -125,19 +125,18 @@ typo_version=$(grep "TYPO_VERSION =*" $path_config_default | sed 's/$TYPO_VERSIO
 # save file .tar.gz
 if [ "$path_save" != "" ] 
 then
-	nom_fichier=$path_save'export_'$typo_db'-'$day_date'.tar.gz'
+	filename=$path_save'export_'$typo_db'-'$day_date'.tar.gz'
 else
-	nom_fichier='export_'$typo_db'-'$day_date'.tar.gz'
+	filename='export_'$typo_db'-'$day_date'.tar.gz'
 fi
 
 # sql file sql
 if [ "$path_sql" != "" ] 
 then
-	nom_fichiersql=$path_sql
+	filenamesql=$path_sql
 else
-	nom_fichiersql='export_'$typo_db'-'$day_date'.sql'
+	filenamesql='export_'$typo_db'-'$day_date'.sql'
 fi
-
 
 echo "-----------------------------------------------------------------------"
 echo "Informations"
@@ -147,10 +146,10 @@ echo "Website size       : $dir_size"
 echo "Size of the DB     : "$db_size"M"
 echo "TYPO3 version      : $typo_version"
 echo "PATH_site          : "$(pwd)
-echo "Save file          : $nom_fichier"
-echo "SQL file           : $nom_fichiersql"
+echo "Tar file           : $filename"
+echo "SQL file           : $filenamesql"
 echo "-----------------------------------------------------------------------"
-echo "Informations in '$path_localconf'"
+echo "Check informations in '$path_localconf'"
 echo "-----------------------------------------------------------------------"
 echo "typo_db_host       : $typo_db_host"
 echo "typo_db_username   : $typo_db_username"
@@ -168,25 +167,26 @@ then
 	fi  
 fi
 
+echo
 echo "-----------------------------------------------------------------------"
-echo "Export the DB $typo_db..."
+echo "Dump the DB $typo_db..."
 echo "-----------------------------------------------------------------------"
-mysqldump -d -h$typo_db_host -u$typo_db_username -p$typo_db_password $typo_db > $nom_fichiersql
-mysqldump -nt --ignore-table=$typo_db.cache_extensions --ignore-table=$typo_db.cache_hash --ignore-table=$typo_db.cache_imagesizes --ignore-table=$typo_db.cache_md5params --ignore-table=$typo_db.cache_md5params --ignore-table=$typo_db.cache_pages --ignore-table=$typo_db.cache_pagesection --ignore-table=$typo_db.cache_treelist --ignore-table=$typo_db.cache_typo3temp_log -h$typo_db_host -u$typo_db_username -p$typo_db_password $typo_db >> $nom_fichiersql
+mysqldump -d -h$typo_db_host -u$typo_db_username -p$typo_db_password $typo_db > $filenamesql
+mysqldump -nt --ignore-table=$typo_db.cache_extensions --ignore-table=$typo_db.cache_hash --ignore-table=$typo_db.cache_imagesizes --ignore-table=$typo_db.cache_md5params --ignore-table=$typo_db.cache_md5params --ignore-table=$typo_db.cache_pages --ignore-table=$typo_db.cache_pagesection --ignore-table=$typo_db.cache_treelist --ignore-table=$typo_db.cache_typo3temp_log -h$typo_db_host -u$typo_db_username -p$typo_db_password $typo_db >> $filenamesql
 
 echo "-----------------------------------------------------------------------"
 echo "Compress the files and DB..."
 echo "-----------------------------------------------------------------------"
-tar cfz $nom_fichier * .htaccess
+tar cfz $filename * .htaccess
 
 echo "-----------------------------------------------------------------------"
 echo "Delete export_$typo_db-$day_date.sql..."
 echo "-----------------------------------------------------------------------"
-rm $nom_fichiersql
+rm $filenamesql
 
 echo "-----------------------------------------------------------------------"
-echo "Backup success"
-echo $(pwd)"/"$nom_fichier
+echo -n "Backup success: "
+echo $(pwd)"/"$filename
 echo "-----------------------------------------------------------------------"
 
 date
