@@ -156,7 +156,7 @@ echo "typo_db_username   : $typo_db_username"
 echo "typo_db            : $typo_db"
 
 # force
-if [ $force == 0 ] 
+if [ $force = 0 ] 
 then
 	echo
 	echo -n "Do you want to backup the website? (y or n) : "
