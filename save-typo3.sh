@@ -125,7 +125,7 @@ typo_version=$(grep "TYPO_VERSION =*" $path_config_default | sed 's/$TYPO_VERSIO
 # save file .tar.gz
 if [ "$path_save" != "" ] 
 then
-	filename=$path_save'export_'$typo_db'-'$day_date'.tar.gz'
+	filename=$path_save
 else
 	filename='export_'$typo_db'-'$day_date'.tar.gz'
 fi
