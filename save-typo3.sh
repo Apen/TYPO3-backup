@@ -18,6 +18,13 @@
 # GNU General Public License for more details.
 ##########################################################################
 
+
+##########################################################################
+# Usage examples :
+#  ./save-typo3.sh
+#  ./save-typo3.sh -p /home/www/ -f /home/backup/files/ -s /home/backup/db/dump.sql
+##########################################################################
+
 # Decode all args
 decodeArgs () {
 	while [ $# -gt 0 ]
