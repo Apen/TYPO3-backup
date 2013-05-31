@@ -11,14 +11,15 @@ Installation
 wget "https://raw.github.com/Apen/TYPO3-backup/master/save-typo3.sh"
 ```
 
-2] Allow your user to execute this script with a chmod.
+2] Allow your user to execute this script with a chmod
 
-3] Execute the script.
+3] Execute the script
+```
+/home/html/dev/packagedev# ./save-typo3.sh
+```
 
 Example of execution
 ------------
-
-	me:/home/html/dev/packagedev# ./save-typo3.sh
 
 	-----------------------------------------------------------------------
 	Informations
