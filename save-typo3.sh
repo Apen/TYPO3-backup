@@ -174,12 +174,47 @@ then
 	fi  
 fi
 
+# configure tables to ignore
+ignoretables[0]="cache_extensions"
+ignoretables[1]="cache_hash"
+ignoretables[2]="cache_imagesizes"
+ignoretables[3]="cache_md5params"
+ignoretables[4]="cache_pages"
+ignoretables[5]="cache_pagesection"
+ignoretables[6]="cache_sys_dmail_stat"
+ignoretables[7]="cache_treelist"
+ignoretables[8]="cache_typo3temp_log"
+ignoretables[9]="cf_cache_hash"
+ignoretables[10]="cf_cache_hash_tags"
+ignoretables[11]="cf_cache_pages"
+ignoretables[12]="cf_cache_pages_tags"
+ignoretables[13]="cf_cache_pagesection"
+ignoretables[14]="cf_cache_pagesection_tags"
+ignoretables[15]="cf_cache_rootline"
+ignoretables[16]="cf_cache_rootline_tags"
+ignoretables[17]="cf_extbase_datamapfactory_datamap"
+ignoretables[18]="cf_extbase_datamapfactory_datamap_tags"
+ignoretables[19]="cf_extbase_object"
+ignoretables[20]="cf_extbase_object_tags"
+ignoretables[21]="cf_extbase_reflection"
+ignoretables[22]="cf_extbase_reflection_tags"
+ignoretables[23]="cf_extbase_typo3dbbackend_tablecolumns"
+ignoretables[24]="cf_extbase_typo3dbbackend_tablecolumns_tags"
+ignoretables[25]="cachingframework_cache_hash"
+ignoretables[26]="cachingframework_cache_hash_tags"
+ignoretables[27]="cachingframework_cache_pages"
+ignoretables[28]="cachingframework_cache_pages_tags"
+ignoretables[29]="cachingframework_cache_pagesection"
+ignoretables[30]="cachingframework_cache_pagesection_tags"
+ignoretableslist=$(printf " --ignore-table=$typo_db.%s" "${ignoretables[@]}")
+ignoretableslist=${ignoretableslist:1}
+
 echo
 echo "-----------------------------------------------------------------------"
 echo "Dump the DB $typo_db..."
 echo "-----------------------------------------------------------------------"
 mysqldump -d -h$typo_db_host -u$typo_db_username -p$typo_db_password $typo_db > $filenamesql
-mysqldump -nt --ignore-table=$typo_db.cache_extensions --ignore-table=$typo_db.cache_hash --ignore-table=$typo_db.cache_imagesizes --ignore-table=$typo_db.cache_md5params --ignore-table=$typo_db.cache_md5params --ignore-table=$typo_db.cache_pages --ignore-table=$typo_db.cache_pagesection --ignore-table=$typo_db.cache_treelist --ignore-table=$typo_db.cache_typo3temp_log -h$typo_db_host -u$typo_db_username -p$typo_db_password $typo_db >> $filenamesql
+mysqldump -nt $ignoretableslist -h$typo_db_host -u$typo_db_username -p$typo_db_password $typo_db >> $filenamesql
 
 echo "-----------------------------------------------------------------------"
 echo "Compress the files and DB..."
