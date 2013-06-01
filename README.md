@@ -8,7 +8,7 @@ Installation
 
 1] Upload the script to your website directory (the same as global index.php) OR download the script with wget:
 ```
-wget "https://raw.github.com/Apen/TYPO3-backup/master/save-typo3.sh"
+wget --no-check-certificate "https://raw.github.com/Apen/TYPO3-backup/master/save-typo3.sh"
 ```
 
 2] Allow your user to execute this script with a chmod
