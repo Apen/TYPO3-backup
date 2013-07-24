@@ -14,8 +14,30 @@ wget --no-check-certificate "https://raw.github.com/Apen/TYPO3-backup/master/sav
 2] Allow your user to execute this script with a chmod
 
 3] Execute the script
+
+basic execution
 ```
-/home/html/dev/packagedev# ./save-typo3.sh
+./save-typo3.sh
+```
+
+backup from a passed typo3 directory
+```
+./save-typo3.sh -p "/home/html/package/"
+```
+
+backup to a specify directory
+```
+./save-typo3.sh -o "/home/html/package6/"
+```
+
+backup with a special name for sql file
+```
+./save-typo3.sh -sql "dump.sql"
+```
+
+backup without confirmation
+```
+./save-typo3.sh -f
 ```
 
 Example of execution
