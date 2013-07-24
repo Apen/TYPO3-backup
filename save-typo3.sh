@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ##########################################################################
 # (c) 2013 Yohann CERDAN <cerdanyohann@yahoo.fr>
@@ -18,52 +18,62 @@
 # GNU General Public License for more details.
 ##########################################################################
 
-
 ##########################################################################
 # Usage examples :
 #  ./save-typo3.sh
-#  ./save-typo3.sh -p /home/www/ -f /home/backup/files/ -s /home/backup/db/dump.sql
+#
+#### backup from a passed typo3 directory
+#  ./save-typo3.sh -p "/home/html/package/"
+#
+#### backup to a specify directory
+#  ./save-typo3.sh -o "/home/html/package6/"
+#
+#### backup with a special name for sql file
+#  ./save-typo3.sh -sql "dump.sql"
+#
+#### backup without confirmation
+#  ./save-typo3.sh -f
 ##########################################################################
 
 # Decode all args
-decodeArgs () {
+function decodeArgs() {
 	while [ $# -gt 0 ]
 	do
 		case $1 in
 			"-f")
 				shift
 				force=1
-				;;
+			;;
 			"-p")
 				shift
-				if [ "$1" != "" ] 
-				then 
+				if [ "$1" != "" ]
+				then
 					cd $1
-				else 
+				else
 					echo "The path to the site root is invalid"
 				fi
 				shift
-				;;
+			;;
 			"-o")
 				shift
-				if [ "$1" != "" ] 
-				then 
+				if [ "$1" != "" ]
+				then
 					path_save=$1
-				else 
+				else
 					echo "The path of the save dir is invalid"
 				fi
 				shift
-				;;
+			;;
 			"-sql")
 				shift
-				if [ "$1" != "" ] 
-				then 
+				if [ "$1" != "" ]
+				then
 					path_sql=$1
-				else 
+				else
 					echo "The filename of the sql save file is invalid"
 				fi
 				shift
-				;;
+			;;
 			"-h")
 				shift
 				echo "-----------------------------------------------------------------------"
@@ -75,24 +85,25 @@ decodeArgs () {
 				echo "-o <output> : path of the save file directory with final /"
 				echo "-sql <sql>  : filename of the sql file .sql"
 				exit
-				;;
+			;;
 			*)
 				shift
-				;;
+			;;
 		esac
 	done
 }
 
 # Check for dependencies
-checkDependency() {
-  if ! hash $1 2>&-; then
-    echo "Failed!"
-    echo "This script requires '$1' but it can not be found. Aborting." >&2
-    exit 1
-  fi
+function checkDependency() {
+	if ! hash $1 2>&-;
+	then
+		echo "Failed!"
+		echo "This script requires '$1' but it can not be found. Aborting."
+		exit 1
+	fi
 }
 
-date 
+date
 
 echo -n "Checking dependencies..."
 checkDependency "grep"
@@ -113,24 +124,43 @@ path_sql=''
 
 decodeArgs $*
 
-# path of localconf
-path_localconf='typo3conf/localconf.php'
-path_config_default='t3lib/config_default.php'
+# DB configuration
+if [ -f typo3conf/LocalConfiguration.php ]
+then
+	# v6
+	path_localconf='typo3conf/LocalConfiguration.php'
+	typo_db_username=$(grep "'username' => *" $path_localconf | sed -e "s/\s*'username'\s*=>\s*'\(.*\)'\s*,/\1/");
+	typo_db_password=$(grep "'password' => *" $path_localconf | sed -e "s/\s*'password'\s*=>\s*'\(.*\)'\s*,/\1/");
+	typo_db_host=$(grep "'host' => *" $path_localconf | sed -e "s/\s*'host'\s*=>\s*'\(.*\)'\s*,/\1/");
+	typo_db=$(grep "'database' => *" $path_localconf | sed -e "s/\s*'database'\s*=>\s*'\(.*\)'\s*,/\1/");
+else
+	# v4
+	path_localconf='typo3conf/localconf.php'
+	typo_db_username=$(grep "typo_db_username =*" $path_localconf | sed 's/$typo_db_username = '\''\([^\;]*\)'\'';.*/\1/');
+	typo_db_password=$(grep "typo_db_password =*" $path_localconf | sed 's/$typo_db_password = '\''\([^\;]*\)'\'';.*/\1/');
+	typo_db_host=$(grep "typo_db_host =*" $path_localconf | sed 's/$typo_db_host = '\''\([^\;]*\)'\'';.*/\1/');
+	typo_db=$(grep "typo_db =*" $path_localconf | sed 's/$typo_db = '\''\([^\;]*\)'\'';.*/\1/');
+fi
 
-# username, password, host & db
-typo_db_username=$(grep "typo_db_username =*" $path_localconf  | sed 's/$typo_db_username = '\''\([^\;]*\)'\'';.*/\1/');
-typo_db_password=$(grep "typo_db_password =*" $path_localconf  | sed 's/$typo_db_password = '\''\([^\;]*\)'\'';.*/\1/');
-typo_db_host=$(grep "typo_db_host =*" $path_localconf  | sed 's/$typo_db_host = '\''\([^\;]*\)'\'';.*/\1/');
-typo_db=$(grep "typo_db =*" $path_localconf  | sed 's/$typo_db = '\''\([^\;]*\)'\'';.*/\1/');
+# TYPO3 infos
+if [ -f typo3/sysext/core/Classes/Core/SystemEnvironmentBuilder.php ]
+then
+	# v6
+	path_config_default='typo3/sysext/core/Classes/Core/SystemEnvironmentBuilder.php'
+	typo_version=$(grep "'TYPO3_version',*" $path_config_default | sed "s/.*'TYPO3_version', '\(.*\)');/\1/");
+else
+	# v4
+	path_config_default='t3lib/config_default.php'
+	typo_version=$(grep "TYPO_VERSION =*" $path_config_default | sed 's/$TYPO_VERSION = '\''\([^\;]*\)'\'';.*/\1/');
+fi
 
 # informations
 day_date=$(date +"%Y%m%d")
 dir_size=$(du -sh . | sed 's/\.//')
 db_size=$(mysql -h$typo_db_host -u$typo_db_username -p$typo_db_password -D$typo_db -e'show table status;' | awk '{sum=sum+$7+$9;} END {print sum/1024/1024}')
-typo_version=$(grep "TYPO_VERSION =*" $path_config_default | sed 's/$TYPO_VERSION = '\''\([^\;]*\)'\'';.*/\1/');
 
 # save file .tar.gz
-if [ "$path_save" != "" ] 
+if [ "$path_save" != "" ]
 then
 	filename=$path_save
 else
@@ -138,7 +168,7 @@ else
 fi
 
 # sql file sql
-if [ "$path_sql" != "" ] 
+if [ "$path_sql" != "" ]
 then
 	filenamesql=$path_sql
 else
@@ -163,7 +193,7 @@ echo "typo_db_username   : $typo_db_username"
 echo "typo_db            : $typo_db"
 
 # force
-if [ $force = 0 ] 
+if [ $force = 0 ]
 then
 	echo
 	echo -n "Do you want to backup the website? (y or n) : "
@@ -171,7 +201,7 @@ then
 	if [ $exportok != "y" ]
 	then
 		exit
-	fi  
+	fi
 fi
 
 # configure tables to ignore
@@ -222,7 +252,7 @@ echo "-----------------------------------------------------------------------"
 tar cfz $filename * .htaccess
 
 echo "-----------------------------------------------------------------------"
-echo "Delete export_$typo_db-$day_date.sql..."
+echo "Delete $filenamesql..."
 echo "-----------------------------------------------------------------------"
 rm $filenamesql
 
