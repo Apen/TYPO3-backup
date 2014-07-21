@@ -2,6 +2,7 @@ About
 -----
 
 This script allow you to backup all the files and the database of your TYPO3 installation.
+It work with TYPO3 4.x - 6.x.
 
 Installation
 ------------
@@ -33,6 +34,11 @@ backup to a specify directory
 backup with a special name for sql file
 ```
 ./save-typo3.sh -sql "dump.sql"
+```
+
+backup databse only
+```
+./save-typo3.sh -f -dbonly
 ```
 
 backup without confirmation

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ##########################################################################
-# (c) 2013 Yohann CERDAN <cerdanyohann@yahoo.fr>
+# (c) 2014 Yohann CERDAN <cerdanyohann@yahoo.fr>
 # All rights reserved
 #
 # This program is free software : you can redistribute it and/or modify
@@ -31,6 +31,9 @@
 #### backup with a special name for sql file
 #  ./save-typo3.sh -sql "dump.sql"
 #
+#### backup database only
+#  ./save-typo3.sh -f -dbonly
+#
 #### backup without confirmation
 #  ./save-typo3.sh -f
 ##########################################################################
@@ -43,6 +46,10 @@ function decodeArgs() {
 			"-f")
 				shift
 				force=1
+			;;
+			"-dbonly")
+				shift
+				dbonly=1
 			;;
 			"-p")
 				shift
@@ -81,6 +88,7 @@ function decodeArgs() {
 				echo "-----------------------------------------------------------------------"
 				echo "All the parameters are optionnals :"
 				echo "-f          : force save without confirmation"
+				echo "-dbonly     : only save database without compression"
 				echo "-p <path>   : path of the site root directory"
 				echo "-o <output> : path of the save file directory with final /"
 				echo "-sql <sql>  : filename of the sql file .sql"
@@ -119,6 +127,7 @@ echo "Succeeded."
 
 # force
 force=0
+dbonly=0
 path_save=''
 path_sql=''
 
@@ -245,6 +254,15 @@ echo "Dump the DB $typo_db..."
 echo "-----------------------------------------------------------------------"
 mysqldump -d -h$typo_db_host -u$typo_db_username -p$typo_db_password $typo_db > $filenamesql
 mysqldump -nt $ignoretableslist -h$typo_db_host -u$typo_db_username -p$typo_db_password $typo_db >> $filenamesql
+
+if [ $dbonly = 1 ]
+then
+	echo "-----------------------------------------------------------------------"
+	echo -n "Backup success: "
+	echo $(pwd)"/"$filenamesql
+	echo "-----------------------------------------------------------------------"
+	exit
+fi
 
 echo "-----------------------------------------------------------------------"
 echo "Compress the files and DB..."
