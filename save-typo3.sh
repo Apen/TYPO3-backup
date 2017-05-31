@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ##########################################################################
-# (c) 2014 Yohann CERDAN <cerdanyohann@yahoo.fr>
+# (c) 2017 Yohann CERDAN <cerdanyohann@yahoo.fr>
 # All rights reserved
 #
 # This program is free software : you can redistribute it and/or modify
@@ -142,6 +142,15 @@ then
 	typo_db_password=$(grep "'password' => *" $path_localconf | sed -e "s/\s*'password'\s*=>\s*'\(.*\)'\s*,/\1/");
 	typo_db_host=$(grep "'host' => *" $path_localconf | sed -e "s/\s*'host'\s*=>\s*'\(.*\)'\s*,/\1/");
 	typo_db=$(grep "'database' => *" $path_localconf | sed -e "s/\s*'database'\s*=>\s*'\(.*\)'\s*,/\1/");
+	# v8
+	if [ -z "$typo_db_username" ]
+	then
+		typo_db_username=$(grep "'user' => *" $path_localconf | sed -e "s/\s*'user'\s*=>\s*'\(.*\)'\s*,/\1/");
+	fi
+	if [ -z "$typo_db" ]
+	then
+		typo_db=$(grep "'dbname' => *" $path_localconf | sed -e "s/\s*'dbname'\s*=>\s*'\(.*\)'\s*,/\1/");
+	fi
 else
 	# v4
 	path_localconf='typo3conf/localconf.php'
@@ -259,7 +268,7 @@ if [ $dbonly = 1 ]
 then
 	echo "-----------------------------------------------------------------------"
 	echo -n "Backup success: "
-	echo $(pwd)"/"$filenamesql
+	echo $filenamesql
 	echo "-----------------------------------------------------------------------"
 	exit
 fi
