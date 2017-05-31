@@ -2,7 +2,7 @@ About
 -----
 
 This script allow you to backup all the files and the database of your TYPO3 installation.
-It work with TYPO3 4.x - 6.x.
+It work with TYPO3 4.x - 7.x.
 
 Installation
 ------------
