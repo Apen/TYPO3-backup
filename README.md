@@ -9,9 +9,9 @@ It work with TYPO3 4.x - 10.4.x.
 
 1. Upload the script to your website directory (the same as global index.php) OR download the script with wget:
 
-    ```
+   
     wget --no-check-certificate "https://raw.github.com/Apen/TYPO3-backup/master/save-typo3.sh"
-    ```
+   
 
 2. Allow your user to execute this script with a chmod
 
@@ -19,39 +19,39 @@ It work with TYPO3 4.x - 10.4.x.
 
 basic execution
 
-    ```
+   
     ./save-typo3.sh
-    ```
+   
 
 backup from a passed typo3 directory
 
-    ```
+   
     ./save-typo3.sh -p "/home/html/package/"
-    ```
+   
 
 backup to a specify directory
 
-    ```
+   
     ./save-typo3.sh -o "/home/html/package6/"
-    ```
+   
 
 backup with a special name for sql file
 
-    ```
+   
     ./save-typo3.sh -sql "dump.sql"
-    ```
+   
 
 backup databse only
 
-    ```
+   
     ./save-typo3.sh -f -dbonly
-    ```
+   
 
 backup without confirmation
 
-    ```
+   
     ./save-typo3.sh -f
-    ```
+   
 
 ## Example of execution
 
