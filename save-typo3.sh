@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ##########################################################################
-# (c) 2017 Yohann CERDAN <cerdanyohann@yahoo.fr>
+# (c) 2020 Yohann CERDAN <cerdanyohann@yahoo.fr>
 # All rights reserved
 #
 # This program is free software : you can redistribute it and/or modify
@@ -161,11 +161,16 @@ else
 fi
 
 # TYPO3 infos
-if [ -f typo3/sysext/core/Classes/Core/SystemEnvironmentBuilder.php ]
+if [ -f typo3/sysext/core/Classes/Information/Typo3Version.php ]
 then
-	# v6
+	# v10
+	path_config_default='typo3/sysext/core/Classes/Information/Typo3Version.php'
+	typo_version=$(grep "const VERSION =" $path_config_default | sed "s/.*const VERSION = '\(.*\)';/\1/");
+elif [ -f typo3/sysext/core/Classes/Core/SystemEnvironmentBuilder.php ]
+then
+	# v6-v9
 	path_config_default='typo3/sysext/core/Classes/Core/SystemEnvironmentBuilder.php'
-	typo_version=$(grep "'TYPO3_version',*" $path_config_default | sed "s/.*'TYPO3_version', '\(.*\)');/\1/");
+	typo_version=$(grep "define('TYPO3_version',*" $path_config_default | sed "s/.*'TYPO3_version', '\(.*\)');/\1/");
 else
 	# v4
 	path_config_default='t3lib/config_default.php'
@@ -222,7 +227,7 @@ then
 	fi
 fi
 
-# configure tables to ignore
+# configure tables wich datas will not be imported
 ignoretables[0]="cache_extensions"
 ignoretables[1]="cache_hash"
 ignoretables[2]="cache_imagesizes"
@@ -254,6 +259,11 @@ ignoretables[27]="cachingframework_cache_pages"
 ignoretables[28]="cachingframework_cache_pages_tags"
 ignoretables[29]="cachingframework_cache_pagesection"
 ignoretables[30]="cachingframework_cache_pagesection_tags"
+ignoretables[31]="cf_adminpanel_requestcache"
+ignoretables[32]="cf_adminpanel_requestcache_tags"
+ignoretables[33]="cf_cache_imagesizes"
+ignoretables[34]="cf_cache_imagesizes_tags"
+
 ignoretableslist=$(printf " --ignore-table=$typo_db.%s" "${ignoretables[@]}")
 ignoretableslist=${ignoretableslist:1}
 
