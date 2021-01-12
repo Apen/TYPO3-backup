@@ -186,9 +186,9 @@ db_size=$(mysql -h$typo_db_host -u$typo_db_username -p$typo_db_password -D$typo_
 if [ "$path_save" != "" ]
 then
 	filename=$path_save
-else
-	filename='export_'$typo_db'-'$day_date'.tar.gz'
 fi
+filename+='export_'$typo_db'-'$day_date'.tar.gz'
+
 
 # sql file sql
 if [ "$path_sql" != "" ]
@@ -295,7 +295,12 @@ rm $filenamesql
 
 echo "-----------------------------------------------------------------------"
 echo -n "Backup success: "
-echo $(pwd)"/"$filename
+if [ "$path_save" != "" ]
+then
+	echo $filename
+else
+	echo $(pwd)"/"$filename
+fi
 echo "-----------------------------------------------------------------------"
 
 date
